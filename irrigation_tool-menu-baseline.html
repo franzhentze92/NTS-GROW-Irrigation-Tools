@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Irrigation Calculators - Calculate your irrigatable area based on water supply" />
+    <title>GROW Irrigation Tools</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            color: #666;
+            margin-bottom: 0;
+        }
+        .info-banner {
+            background: #e8f5e9;
+            border-left: 4px solid #8bb439;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .info-banner:hover {
+            background: #d4edda;
+        }
+        .info-banner .material-icons {
+            color: #8bb439;
+            margin-right: 0.75rem;
+            font-size: 1.5rem;
+        }
+        .info-banner .material-icons.rotate {
+            transform: rotate(180deg);
+        }
+        .section {
+            margin-bottom: 3rem;
+        }
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2196F3;
+            margin-bottom: 0.5rem;
+        }
+        .section-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .tool-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: #8bb439;
+        }
+        .tool-card.start-here {
+            border-color: #ff9800;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+        }
+        .tool-card.start-here::before {
+            content: "⭐ START HERE";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: #ff9800;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .tool-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        .tool-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .tool-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .icon-water-depth { background: #e3f2fd; color: #1976d2; }
+        .icon-frequency { background: #e1f5fe; color: #0288d1; }
+        .icon-run-time { background: #fff3e0; color: #f57c00; }
+        .icon-application-rate { background: #e8f5e9; color: #388e3c; }
+        .icon-irrigatable-area { background: #fff8e1; color: #f9a825; }
+        .icon-pumping-requirements { background: #e0f2f1; color: #00796b; }
+        .icon-pump-horsepower { background: #fce4ec; color: #c2185b; }
+        .icon-irrigation-times { background: #f3e5f5; color: #7b1fa2; }
+        .icon-pipe-velocity { background: #e0f2f1; color: #00897b; }
+        .icon-friction-loss { background: #e3f2fd; color: #1976d2; }
+        .icon-pipe-size { background: #e8f5e9; color: #388e3c; }
+        .icon-drip-line { background: #e1f5fe; color: #0288d1; }
+        .icon-nozzle-application { background: #fff3e0; color: #f57c00; }
+        .icon-nozzle-flow { background: #f3e5f5; color: #7b1fa2; }
+        .icon-hose-flow { background: #e8f5e9; color: #388e3c; }
+        .about-content {
+            display: none;
+            padding-top: 1rem;
+            color: #666;
+            line-height: 1.6;
+        }
+        .about-content.show {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .main-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Irrigation Calculators</h1>
+            <p>Select an irrigation calculator to get started. Click any tool below to open the calculator.</p>
+        </div>
+
+        <!-- About Banner -->
+        <div class="info-banner" onclick="toggleAbout()">
+            <span class="material-icons" id="aboutIcon">info</span>
+            <div style="flex: 1;">
+                <strong>About This Irrigation Tool</strong>
+                <span class="material-icons" id="dropdownIcon" style="float: right; font-size: 1.2rem; margin-right: 0.5rem;">expand_more</span>
+            </div>
+            <div class="about-content" id="aboutContent">
+                <p>This tool provides comprehensive irrigation calculators organized into three main sections:</p>
+                <ul>
+                    <li><strong>Section A - Irrigation Planning:</strong> Tools for determining crop water requirements and irrigation scheduling.</li>
+                    <li><strong>Section B - System Capacity & Pumping:</strong> Tools for calculating system capacity and pump requirements.</li>
+                    <li><strong>Section C - Hydraulic/Engineering:</strong> Advanced tools for pipe sizing, flow rates, and system design.</li>
+                </ul>
+                <p>Start with <strong>Water Depth (Required Water)</strong> to establish your baseline irrigation requirements.</p>
+            </div>
+        </div>
+
+        <!-- SECTION A - Irrigation Planning -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">🔵 SECTION A — Irrigation Planning (Crop Demand Tools)</div>
+                <div class="section-description">These will include the benchmark irrigation values.</div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card start-here" onclick="openCalculator('water-depth')">
+                    <div class="tool-icon icon-water-depth">
+                        <span class="material-icons">vertical_align_center</span>
+                    </div>
+                    <div class="tool-title">Water Depth (Required Water)</div>
+                    <div class="tool-description">Calculate the depth of water required for irrigation based on crop needs and soil conditions.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('irrigation-frequency')">
+                    <div class="tool-icon icon-frequency">
+                        <span class="material-icons">schedule</span>
+                    </div>
+                    <div class="tool-title">Irrigation Frequency</div>
+                    <div class="tool-description">Determine how often irrigation should occur based on crop water use and soil characteristics.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('irrigation-run-time')">
+                    <div class="tool-icon icon-run-time">
+                        <span class="material-icons">timer</span>
+                    </div>
+                    <div class="tool-title">Irrigation Run Time</div>
+                    <div class="tool-description">Calculate the time needed for the irrigation system to run to apply the required water depth.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('water-application-rate')">
+                    <div class="tool-icon icon-application-rate">
+                        <span class="material-icons">water_drop</span>
+                    </div>
+                    <div class="tool-title">Water Application Rate</div>
+                    <div class="tool-description">Calculate the rate at which water is applied to a given area by your irrigation system.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION B - System Capacity & Pumping -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">🔵 SECTION B — System Capacity & Pumping Tools</div>
+                <div class="section-description">Calculate system capacity, pumping requirements, and pump sizing.</div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="openCalculator('irrigatable-area')">
+                    <div class="tool-icon icon-irrigatable-area">
+                        <span class="material-icons">crop_square</span>
+                    </div>
+                    <div class="tool-title">Irrigatable Area</div>
+                    <div class="tool-description">Calculate the land area that can be irrigated with a given water supply and application rate.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('system-pumping-requirements')">
+                    <div class="tool-icon icon-pumping-requirements">
+                        <span class="material-icons">opacity</span>
+                    </div>
+                    <div class="tool-title">System Pumping Requirements</div>
+                    <div class="tool-description">Calculate the total flow rate required to operate your irrigation system.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('required-water-pump-horsepower')">
+                    <div class="tool-icon icon-pump-horsepower">
+                        <span class="material-icons">power</span>
+                    </div>
+                    <div class="tool-title">Required Water Pump Horsepower</div>
+                    <div class="tool-description">Estimate brake horsepower and total power requirements for irrigation pumps.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION C - Hydraulic / Engineering -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">🔵 SECTION C — Hydraulic / Engineering Tools</div>
+                <div class="section-description">Advanced calculations for pipe sizing, flow rates, and hydraulic system design.</div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="openCalculator('irrigation-times')">
+                    <div class="tool-icon icon-irrigation-times">
+                        <span class="material-icons">access_time</span>
+                    </div>
+                    <div class="tool-title">Irrigation Times</div>
+                    <div class="tool-description">Determine set time required for given water application and flow rate.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('pipe-water-velocity')">
+                    <div class="tool-icon icon-pipe-velocity">
+                        <span class="material-icons">speed</span>
+                    </div>
+                    <div class="tool-title">Pipe Water Velocity</div>
+                    <div class="tool-description">Calculate water velocity inside a pipe using flow rate and diameter.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('pipe-friction-loss')">
+                    <div class="tool-icon icon-friction-loss">
+                        <span class="material-icons">drag_handle</span>
+                    </div>
+                    <div class="tool-title">Pipe Friction Loss</div>
+                    <div class="tool-description">Calculate pressure loss due to pipe friction using the Hazen-Williams equation.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('minimum-required-pipe-size')">
+                    <div class="tool-icon icon-pipe-size">
+                        <span class="material-icons">straighten</span>
+                    </div>
+                    <div class="tool-title">Minimum Required Pipe Size</div>
+                    <div class="tool-description">Calculate the minimum pipe diameter for a given flow, length, material, and pressure loss.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('drip-line-application-rate')">
+                    <div class="tool-icon icon-drip-line">
+                        <span class="material-icons">water_drop</span>
+                    </div>
+                    <div class="tool-title">Drip Line Application Rate</div>
+                    <div class="tool-description">Calculate the application rate of a drip line irrigation system.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('nozzle-application-rate')">
+                    <div class="tool-icon icon-nozzle-application">
+                        <span class="material-icons">spray</span>
+                    </div>
+                    <div class="tool-title">Nozzle Application Rate</div>
+                    <div class="tool-description">Calculate the effective application rate of a sprinkler nozzle system.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('nozzle-flow-rate-diameter')">
+                    <div class="tool-icon icon-nozzle-flow">
+                        <span class="material-icons">center_focus_strong</span>
+                    </div>
+                    <div class="tool-title">Nozzle Flow Rate / Diameter</div>
+                    <div class="tool-description">Calculate nozzle flow rate or required diameter for a given pressure.</div>
+                </div>
+                <div class="tool-card" onclick="openCalculator('garden-hose-flow-rate-time')">
+                    <div class="tool-icon icon-hose-flow">
+                        <span class="material-icons">water</span>
+                    </div>
+                    <div class="tool-title">Garden Hose Flow Rate & Time</div>
+                    <div class="tool-description">Calculate garden hose flow rate or time to fill a container.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAbout() {
+            const content = document.getElementById('aboutContent');
+            const icon = document.getElementById('dropdownIcon');
+            content.classList.toggle('show');
+            icon.classList.toggle('rotate');
+        }
+
+        // Map calculator IDs to React app routes
+        const calculatorRoutes = {
+            'water-depth': '/water-depth',
+            'irrigation-frequency': '/irrigation-frequency',
+            'irrigation-run-time': '/irrigation-run-time',
+            'water-application-rate': '/water-application-rate',
+            'irrigatable-area': '/irrigatable-area',
+            'system-pumping-requirements': '/system-pumping-requirements',
+            'required-water-pump-horsepower': '/required-water-pump-horsepower',
+            'irrigation-times': '/irrigation-times',
+            'pipe-water-velocity': '/pipe-water-velocity',
+            'pipe-friction-loss': '/pipe-friction-loss',
+            'minimum-required-pipe-size': '/minimum-required-pipe-size',
+            'drip-line-application-rate': '/drip-line-application-rate',
+            'nozzle-application-rate': '/nozzle-application-rate',
+            'nozzle-flow-rate-diameter': '/nozzle-flow-rate-diameter',
+            'garden-hose-flow-rate-time': '/garden-hose-flow-rate-time'
+        };
+
+        function openCalculator(calculatorId) {
+            // Get the route for this calculator
+            const route = calculatorRoutes[calculatorId] || '/irrigation';
+            // Navigate to the local React app with the specific calculator route
+            // Note: This assumes the React app is built and served, or running on a dev server
+            // You may need to adjust the base path based on how the React app is served
+            const basePath = 'ntsgrow_irrigation_tool-main';
+            window.location.href = `${basePath}${route}`;
+        }
+    </script>
+</body>
+</html>
